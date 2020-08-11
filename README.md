@@ -13,7 +13,6 @@ In combination with ammonites "watch" mode, this worked well enough for me to ha
 import $exec.`c:\\temp\\nkd`
 
 val test = ujson.read(requests.get("https://vega.github.io/vega/examples/bar-chart.vg.json").text)
-println(ujson.write(test("data")(0)("values"), indent=4))
 showSpec(test, "Bar Chart")
 test("data")(0)("values") = ujson.Arr(
 	ujson.Obj("category" -> "Epic", "amount" -> 50),
