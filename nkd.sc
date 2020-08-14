@@ -74,7 +74,6 @@ def fixAppearence(spec:ujson.Value) = {
 	spec
 }
 
-
 val resizeSignals2 = ujson.read("""
 
 [

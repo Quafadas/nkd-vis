@@ -1,0 +1,105 @@
+{
+  "$schema": "https://vega.github.io/schema/vega/v5.json",
+  "description": "Based on https://vega.github.io/vega/examples/probability-density.vg.json",
+  "padding": 5,
+  "width": 800,
+  "height": 800,
+  "signals": [   ],
+  "data": [
+    {
+      "name": "points",
+      "url": "data/normal-2d.json"
+    },
+    {
+      "name": "summary",
+      "source": "points",
+      "transform": [
+        {
+          "type": "aggregate",
+          "fields": ["u", "u"],
+          "ops": ["mean", "stdev"],
+          "as": ["mean", "stdev"]
+        }
+      ]
+    },
+    {
+      "name": "density",
+      "source": "points",
+      "transform": [
+        {
+          "type": "density",
+          "extent": {"signal": "domain('xscale')"},
+          "method": "cdf",
+          "distribution": {
+            "function": "kde",
+            "field": "u",
+            "bandwidth": 0
+          }
+        }
+      ]
+    }
+  ],
+
+  "scales": [
+    {
+      "name": "xscale",
+      "type": "linear",
+      "range": "width",
+      "domain": {"data": "points", "field": "u"},
+      "nice": true
+    },
+    {
+      "name": "yscale",
+      "type": "linear",
+      "range": "height", "round": true,
+      "domain": {
+        "fields": [
+          {"data": "density", "field": "density"}          
+        ]
+      }
+    },
+    {
+      "name": "color",
+      "type": "ordinal",
+      "domain": ["ecdf"],
+      "range": ["steelblue"]
+    }
+  ],
+
+  "axes": [
+    {"orient": "bottom", "scale": "xscale", "zindex": 1, "grid" : true},
+    {"orient": "left", "scale": "yscale", "zindex": 1, "grid" : true}
+  ],
+
+  "legends": [
+    {"orient": "top-left", "fill": "color", "offset": 0, "zindex": 1}
+  ],
+
+  "marks": [
+    {
+      "type": "line",
+      "from": {"data": "density"},
+	  "tooltip": true,
+      "encode": {
+        "update": {
+          "x": {"scale": "xscale", "field": "value"},
+          "y": {"scale": "yscale", "field": "density"}
+        }
+      }
+    },
+    {
+      "type": "rect",
+      "from": {"data": "points"},
+      "encode": {
+        "enter": {
+          "x": {"scale": "xscale", "field": "u"},
+          "width": {"value": 1},
+          "y": {"value": 25, "offset": {"signal": "height"}},
+          "height": {"value": 5},
+          "fill": {"value": "steelblue"},
+          "fillOpacity": {"value": 0.4}
+        }
+      }
+    }
+  ]
+}

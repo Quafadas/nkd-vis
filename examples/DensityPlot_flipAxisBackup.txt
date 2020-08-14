@@ -1,0 +1,109 @@
+{
+  "$schema": "https://vega.github.io/schema/vega/v5.json",
+  "description": "Based on https://vega.github.io/vega/examples/probability-density.vg.json",
+  "padding": 5,
+  "width": 800,
+  "height": 800,
+  "signals": [  ],
+  "data": [
+    {
+      "name": "points",
+      "url": "data/normal-2d.json"
+    },
+    {
+      "name": "summary",
+      "source": "points",
+      "transform": [
+        {
+          "type": "aggregate",
+          "fields": ["u", "u"],
+          "ops": ["mean", "stdev"],
+          "as": ["mean", "stdev"]
+        }
+      ]
+    },
+    {
+      "name": "density",
+      "source": "points",
+      "transform": [
+        {
+          "type": "density",
+          "extent": {"signal": "domain('yscale')"},
+          "method": "cdf",
+          "distribution": {
+            "function": "kde",
+            "field": "u",
+            "steps":10000
+          }
+        },
+		{"type": "identifier", "as": "_vgsid_"}
+      ]
+    }
+  ],
+
+  "scales": [
+    {
+      "name": "xscale",
+      "type": "log",
+      "range": "width",
+      "domain": {"data": "density", "field": "density"},
+      "nice": true
+    },
+    {
+      "name": "yscale",
+      "type": "log",
+      "range": "height",
+      "domain": {
+        "fields": [
+          {"data": "points", "field": "u"}          
+        ]
+      }
+    },    
+    {
+      "name": "color",
+      "type": "ordinal",
+      "domain": ["ecdf"],
+      "range": ["steelblue"]
+    }
+  ],
+
+
+
+  "legends": [
+    {"orient": "top-left", "fill": "color", "offset": 0, "zindex": 1}
+  ],
+
+  "marks": [
+    {
+      "type": "line",
+      "from": {"data": "density"},
+	  "tooltip": true,
+      "encode": {
+        "update": {
+          "x": {"scale": "xscale", "field": "density"},
+          "y": {"scale": "yscale", "field": "value"}
+        }
+      }
+    },
+    {
+      "type": "rect",
+      "from": {"data": "points"},
+	  "interactive": true,
+      "encode": {
+        "enter": {
+          "y": {"scale": "yscale", "field": "u"},
+          "height": {"value": 1},
+          "x": {"value": 25, "offset": {"signal": "width"}},
+		  "tooltip": {"signal": "{tret : datum.u, prob: datum.probability}"},
+          "width": {"value": 5},
+          "fill": {"value": "steelblue"},
+          "fillOpacity": {"value": 0.4}
+        }
+      }
+    }
+  ], 
+    "axes": [
+    {"orient": "bottom", "scale": "xscale", "zindex": 1, "grid" : true, "title": "CDF", "titleAnchor":"middle", "gridOpacity":0.5},
+    {"orient": "left", "scale": "yscale", "zindex": 1, "grid" : true, "title": "TRET", "titleAnchor":"middle", "gridOpacity":0.5}
+  ]
+}
